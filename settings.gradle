@@ -1,1 +1,3 @@
 include ':app'
+include ':my_lib_apt:my_lib_compiler'//注解处理器
+include ':my_lib_apt:my_lib_annotations'//注解位置

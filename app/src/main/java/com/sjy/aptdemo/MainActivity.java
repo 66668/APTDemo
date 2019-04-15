@@ -14,5 +14,7 @@ public class MainActivity extends AppCompatActivity {
 //        MethodSpec
 //        JavaFile
 //        AbstractPr
+
+//        ThreadMXBean tmbean = ManagementFactory.getThreadMXBean();
     }
 }
