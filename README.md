@@ -1,5 +1,6 @@
 # APT/JavaPoet 编译期注解处理技术（自定义ButterKnife注解）
 
+APT（Annotation Processing Tool）
 ## 注解简介：
 运行时注解：因为性能问题被诟病
 
@@ -57,10 +58,10 @@ abstractProcess:用于在编译时（通常as点击build按钮后），扫描和
         向系统注册processor(自定义注解处理器)，执行编译时使用processor进行处理
         
     javapoet作用：
-        提供了一套生成java代码的api，利用这些api处理注解，生成新的代码或源文件。
+        提供了一套生成java代码的api，利用这些api处理注解，生成新的代码或源文件。用于注解之后，进行的代码处理框架（比手动写效率高）
     
 ### 具体代码实现步骤
 1. 创建my_lib_annotations:用于存放 项目中要使用的注解
-2. 
+2. 创建my_lib_compiler：库主要是应用apt技术处理注解，生成相关代码或者相关源文件，是核心所在
     
          

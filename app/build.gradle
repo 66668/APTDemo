@@ -10,6 +10,11 @@ android {
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
+    //注解添加
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
+    }
     buildTypes {
         release {
             minifyEnabled false
@@ -26,47 +31,4 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 
-    //************自定义注解---依赖************
-
-    //========注解必备（1）=========
-
-    //javapoet :https://github.com/square/javapoet
-
-    //用于注解之后，进行的代码处理框架（比手动写效率高）
-    implementation 'com.squareup:javapoet:1.11.1'
-
-    //========注解必备（2）=========
-
-    //https://github.com/google/auto下，除了auto-service,还有auto-common,auto-factory,auto-value，共4个辅助框架，如下
-
-    //(2)-1
-
-    //auto-service: https://github.com/google/auto/tree/master/service
-
-    //处理器注册
-    implementation 'com.google.auto.service:auto-service:1.0-rc5'
-
-    //(2)-2
-
-    //auto-common: https://github.com/google/auto/tree/master/common
-
-    //
-
-    //    implementation 'com.google.auto:auto-common:0.10'
-
-    //(2)-3
-
-    //auto-factory: https://github.com/google/auto/tree/master/factory
-
-    //
-
-    //    implementation 'com.google.auto.factory:auto-factory:1.0-beta6'
-
-    //(2)-4
-
-    //auto-value : https://github.com/google/auto/tree/master/value
-
-    //
-
-    // implementation 'com.google.auto.value:auto-value:1.6.3'
 }
