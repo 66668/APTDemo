@@ -2,6 +2,9 @@ package com.sjy.aptdemo;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
+
+import java.util.HashMap;
 
 
 public class MainActivity extends AppCompatActivity {

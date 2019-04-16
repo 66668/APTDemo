@@ -12,6 +12,7 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])//java库的依赖
 //    implementation fileTree(include: ['*.jar'], dir: 'libs')//android库的依赖
     //************自定义注解---依赖************
+
     //========注解必备（1）=========
     //添加自定义注解的库
     implementation project(':my_lib_apt:my_lib_annotations')

@@ -63,5 +63,28 @@ abstractProcess:用于在编译时（通常as点击build按钮后），扫描和
 ### 具体代码实现步骤
 1. 创建my_lib_annotations:用于存放 项目中要使用的注解
 2. 创建my_lib_compiler：库主要是应用apt技术处理注解，生成相关代码或者相关源文件，是核心所在
+
+其中，process的核心思想步骤如下（butterKnife也是这么处理的，面试核心所在）：
+
+            //第一步 生成main函数
+            MethodSpec main = MethodSpec.methodBuilder("main")
+                    .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                    .returns(void.class)
+                    .addParameter(String[].class, "args")
+                    .addStatement("$T.out.println($S)", System.class, "Hello, JavaPoet!")
+                    .build();
+            //第二步 生成类
+            TypeSpec helloWorld = TypeSpec.classBuilder("HelloWorld")
+                    .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
+                    .addMethod(main)
+                    .build();
+            //第三步 生成java文件对象
+            JavaFile javaFile = JavaFile.builder("com.zero.helloworld", helloWorld).build();
+            //第四步 输出到文件
+            try {
+                javaFile.writeTo(filer);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
     
          
