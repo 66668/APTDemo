@@ -17,16 +17,10 @@ APT（Annotation Processing Tool）
 
 APT(annotation processing tool) 是一种注解处理工具，它对源码文件进行检测，找出其中的annotation,根据注解自动生成代码
 
-### apt处理annotation流程：
-1. 定义注解
-2. 定义注解处理器，自定义需要生成的代码
-3. 使用处理器
-4. apt自动完成剩下的操作
-
 
 ### apt的处理要素+概念理解：
 
-**注解处理器**（abstractProcess）+**代码处理**（javaPoet，最好不要自己处理）+**处理器注册**（AutoService）+**apt(AnnotationProcessor)**
+**注解处理器**（abstractProcess）+**代码处理**（最好不要自己处理,使用开源javaPoet）+**处理器注册**（AutoService，google开源的auto）+**apt(AnnotationProcessor)**
 
 
 
@@ -36,21 +30,24 @@ abstractProcess:用于在编译时（通常as点击build按钮后），扫描和
 
 1. process()方法：类似java的main()入口
 2. init()方法：Types/Elements/Filer 获取工具
+3. getSupportedAnnotationTypes:处理器想要处理的自定义注解
+4. getSupportedSourceVersion： 指定使用的Java版本
 
+    
+### 具体代码实现步骤
+1. 创建my_lib_annotations:用于存放 项目中要使用的注解
+2. 创建my_lib_compiler：库主要是应用apt技术处理注解，生成相关代码或者相关源文件，是核心所在
 
-自定义注解所需要的依赖：
+my_lib_compiler需要的依赖：
 
-1：app/build.gradle/dependencies: 
+1：my_lib_compiler/app/build.gradle/dependencies: 
 
+    //添加自定义注解的库
+    implementation project(':my_lib_apt:my_lib_annotations')
     implementation 'com.squareup:javapoet:1.11.1'
-
-2: app/build.gradle/dependencies:
-
     //开源：https://github.com/google/auto
     implementation 'com.google.auto.service:auto-service:1.0-rc5'
-    //implementation 'com.google.auto:auto-common:0.10'
-    //implementation 'com.google.auto.factory:auto-factory:1.0-beta6'
-    //implementation 'com.google.auto.value:auto-value:1.6.3'
+    implementation 'com.google.auto:auto-common:0.10'
     
    说明：  
    
@@ -59,12 +56,14 @@ abstractProcess:用于在编译时（通常as点击build按钮后），扫描和
         
     javapoet作用：
         提供了一套生成java代码的api，利用这些api处理注解，生成新的代码或源文件。用于注解之后，进行的代码处理框架（比手动写效率高）
-    
-### 具体代码实现步骤
-1. 创建my_lib_annotations:用于存放 项目中要使用的注解
-2. 创建my_lib_compiler：库主要是应用apt技术处理注解，生成相关代码或者相关源文件，是核心所在
-
-其中，process的核心思想步骤如下（butterKnife也是这么处理的，面试核心所在）：
+  
+### apt处理annotation流程：
+1. 定义注解
+2. 定义注解处理器，自定义需要生成的代码
+3. 使用处理器
+4. apt自动完成剩下的操作
+  
+步骤2：process方法的核心步骤如下（butterKnife也是这么处理的，面试核心所在）：
 
             //第一步 生成main函数
             MethodSpec main = MethodSpec.methodBuilder("main")
@@ -86,5 +85,7 @@ abstractProcess:用于在编译时（通常as点击build按钮后），扫描和
             } catch (IOException e) {
                 e.printStackTrace();
             }
-    
+
+剩下的就是参考butterKnife实现bindView的功能即可，理解上述讲解，apt技术就会了。
+
          
