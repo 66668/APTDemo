@@ -58,12 +58,13 @@ my_lib_compiler需要的依赖：
         提供了一套生成java代码的api，利用这些api处理注解，生成新的代码或源文件。用于注解之后，进行的代码处理框架（比手动写效率高）
   
 ### apt处理annotation流程：
+
 1. 定义注解
 2. 定义注解处理器，自定义需要生成的代码
 3. 使用处理器
 4. apt自动完成剩下的操作
   
-步骤2：process方法的核心步骤如下（butterKnife也是这么处理的，面试核心所在）：
+**步骤**：process方法的核心步骤如下（butterKnife也是这么处理的，面试核心所在）：
 
             //第一步 生成main函数
             MethodSpec main = MethodSpec.methodBuilder("main")
