@@ -3,17 +3,18 @@ package com.sjy.compiler;
 import com.google.auto.service.AutoService;
 import com.sjy.annotation.MyBindAct;
 import com.sjy.annotation.MyBindView;
-import com.sjy.compiler.mybindview_bean.BindingSet;
-import com.sjy.compiler.mybindview_bean.Id;
 import com.sun.source.util.Trees;
-import com.sun.tools.javac.util.Log;
 
+import java.io.IOException;
 import java.lang.annotation.Annotation;
+import java.lang.annotation.ElementType;
+import java.util.ArrayDeque;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import javax.annotation.Nullable;
 import javax.annotation.processing.AbstractProcessor;
@@ -72,10 +73,14 @@ public class MyProcessor extends AbstractProcessor {
     private SourceVersion sourceVersion;
     private Map<String, String> optMap;
 
-    private Map<String, AnnotatedClass> mAnnotatedClassMap;
+
     //===============核心设置==================
-    private @Nullable
-    Trees trees;
+    private Map<String, MyAnnotationClass> mAnnotatedClassMap;
+
+
+    //================================================================================================
+    //==========================================四个重写方法==========================================
+    //================================================================================================
 
     /**
      * (1)
@@ -91,10 +96,6 @@ public class MyProcessor extends AbstractProcessor {
         //===============核心设置==================
         typesUtils = processingEnv.getTypeUtils();
         filer = processingEnv.getFiler();
-        try {
-            trees = Trees.instance(processingEnv);
-        } catch (IllegalArgumentException ignored) {
-        }
 
         //ProcessingEnvironment可以获取的对象
         elements = processingEnv.getElementUtils();
@@ -102,6 +103,8 @@ public class MyProcessor extends AbstractProcessor {
         locale = processingEnv.getLocale();
         sourceVersion = processingEnv.getSourceVersion();
         optMap = processingEnv.getOptions();
+        //
+        mAnnotatedClassMap = new TreeMap<>();
     }
 
     /**
@@ -116,9 +119,24 @@ public class MyProcessor extends AbstractProcessor {
      */
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-        Map<TypeElement, BindingSet> bindingMap = findAndParseTargets(roundEnv);
+        mAnnotatedClassMap.clear();
 
-        return false;
+        //创建自定义注解处理类
+        try {
+            processMyBindView(roundEnv);
+        } catch (Exception e) {
+            System.out.println("异常:" + e.toString());
+        }
+
+        //将自定义注解处理类，写入文件
+        for (MyAnnotationClass annotationClass : mAnnotatedClassMap.values()) {
+            try {
+                annotationClass.generateFiler().writeTo(filer);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return true;
     }
 
     /**
@@ -155,59 +173,57 @@ public class MyProcessor extends AbstractProcessor {
     //================================================================================================
 
     /**
-     * 模仿butterKnife的写法,给（3）getSupportedAnnotationTypes使用
+     * 创建 MyBindView的处理类
+     *
+     * @param roundEnv
+     */
+    private void processMyBindView(RoundEnvironment roundEnv) {
+
+        for (Element element : roundEnv.getElementsAnnotatedWith(MyBindView.class)) {
+            MyAnnotationClass annotationClass = createMyAnnotationClass(element);
+            MyBindViewField bindViewField = new MyBindViewField(element);
+            annotationClass.addField(bindViewField);
+
+            System.out.println("processBindView annotatedClass: " + annotationClass);
+            System.out.println("processBindView bindViewField: " + bindViewField);
+        }
+
+    }
+
+    /**
+     * 根据 MyBindView，获取每一个Element的处理类,并将生成的处理类保存到map中
+     *
+     * @param element
+     * @return
+     */
+    private MyAnnotationClass createMyAnnotationClass(Element element) {
+        TypeElement typeElement = (TypeElement) element.getEnclosingElement();
+        String fullName = typeElement.getQualifiedName().toString();
+        System.out.println("getAnnotatedClass typeElement: " + typeElement);
+        MyAnnotationClass annotationClass = mAnnotatedClassMap.get(fullName);
+        //如果集合中不存在，则添加到集合中
+        if (annotationClass == null) {
+            //创建注解处理类
+            annotationClass = new MyAnnotationClass(typeElement, typesUtils);
+            mAnnotatedClassMap.put(fullName, annotationClass);
+        }
+        return annotationClass;
+    }
+
+    /**
      * <p>
      * 将自定义的注解添加到set列表中
+     * <p>
+     * 模仿butterKnife的写法,给（3）getSupportedAnnotationTypes使用
      *
      * @return
      */
     private Set<Class<? extends Annotation>> getSupportedAnnotations() {
         Set<Class<? extends Annotation>> annotations = new LinkedHashSet<>();
         annotations.add(MyBindView.class);
-        annotations.add(MyBindAct.class);
+//        annotations.add(MyBindAct.class);
         return annotations;
     }
 
-    /**
-     * 自定义注解的获取并处理，封装到具体的类中，自定义处理
-     */
-    private void findAndParseTargets(RoundEnvironment roundEnv) {
-        Map<TypeElement, BindingSet.Builder> builderMap = new LinkedHashMap<>();
-        Set<TypeElement> erasedTargetNames = new LinkedHashSet<>();
-
-        //处理自定义注解 MyBindView
-        for (Element element : roundEnv.getElementsAnnotatedWith(MyBindAct.class)) {
-            try {
-                parseMyBindView(element, builderMap, erasedTargetNames);
-            } catch (Exception e) {
-                //简化butterKnife对应的处理
-                System.out.println("e=" + e.getMessage());
-            }
-        }
-        //如果还自定义其他注解，仿照for循环，处理即可
-
-    }
-
-    /**
-     * 该处是处理MyBindView
-     *
-     * @param element
-     * @param builderMap
-     * @param erasedTargetNames
-     */
-    private void parseMyBindView(Element element, Map<TypeElement, BindingSet.Builder> builderMap, Set<TypeElement> erasedTargetNames) {
-        boolean hasError = false;
-        TypeElement enclosingElement = (TypeElement) element.getEnclosingElement();
-
-        // Assemble information on the field.
-        String name = element.getSimpleName().toString();
-        int id = element.getAnnotation(MyBindView.class).value();//拿到绑定的控件id
-        Id resourceId = elementToId(element, MyBindView.class, id);
-        BindingSet.Builder builder = getOrCreateBindingBuilder(builderMap, enclosingElement);
-        builder.addResource(
-                new FieldResourceBinding(resourceId, name, FieldResourceBinding.Type.STRING));
-
-        erasedTargetNames.add(enclosingElement);
-    }
 
 }
