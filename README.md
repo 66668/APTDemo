@@ -64,28 +64,31 @@ my_lib_compiler需要的依赖：
 3. 使用处理器
 4. apt自动完成剩下的操作
   
-**步骤**：process方法的核心步骤如下（butterKnife也是这么处理的，面试核心所在）：
+**步骤**：：
+
+javapoet使用简介：
 
             //第一步 生成main函数
-            MethodSpec main = MethodSpec.methodBuilder("main")
-                    .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                    .returns(void.class)
-                    .addParameter(String[].class, "args")
-                    .addStatement("$T.out.println($S)", System.class, "Hello, JavaPoet!")
+            MethodSpec main = MethodSpec.methodBuilder("main")//生成方法名
+                    .addModifiers(Modifier.PUBLIC, Modifier.STATIC)//修饰符
+                    .returns(void.class)//返回类型
+                    .addParameter(String[].class, "args")//参数
+                    .addStatement("$T.out.println($S)", System.class, "Hello, JavaPoet!")//打印：System.out.printlin("Hello,JavaPoet");
                     .build();
             //第二步 生成类
-            TypeSpec helloWorld = TypeSpec.classBuilder("HelloWorld")
-                    .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
-                    .addMethod(main)
+            TypeSpec helloWorld = TypeSpec.classBuilder("HelloWorld")//生成类
+                    .addModifiers(Modifier.PUBLIC, Modifier.FINAL)//类修饰
+                    .addMethod(main)//添加方法
                     .build();
             //第三步 生成java文件对象
-            JavaFile javaFile = JavaFile.builder("com.zero.helloworld", helloWorld).build();
+            JavaFile javaFile = JavaFile.builder("com.sjy.demo", helloWorld).build();//（包名，对象）
             //第四步 输出到文件
             try {
                 javaFile.writeTo(filer);
             } catch (IOException e) {
                 e.printStackTrace();
             }
+利用JavaPoet生成java代码
 
 剩下的就是参考butterKnife实现bindView的功能即可，理解上述讲解，apt技术就会了。
 

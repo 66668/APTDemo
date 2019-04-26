@@ -1,22 +1,18 @@
 package com.sjy.compiler;
 
 import com.google.auto.service.AutoService;
-import com.sjy.annotation.MyBindAct;
 import com.sjy.annotation.MyBindView;
-import com.sun.source.util.Trees;
+import com.sjy.compiler.mybindview_bean.MyAnnotationClass;
+import com.sjy.compiler.mybindview_bean.MyBindViewField;
 
 import java.io.IOException;
 import java.lang.annotation.Annotation;
-import java.lang.annotation.ElementType;
-import java.util.ArrayDeque;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import javax.annotation.Nullable;
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.Filer;
 import javax.annotation.processing.Messager;
@@ -33,7 +29,7 @@ import javax.lang.model.util.Types;
 /**
  * 该类的处理方式都模仿butterknife
  *
- * <1>说明：初次创建MyProcessor时，extends AbstractProcessor会报红出错，解决方案
+ * <1>说明：初次创建MyProcessor时，extends AbstractProcessor会报红出错，解决方案（需要）
  * <p>
  * 方案1
  * 运行注解处理器
@@ -43,7 +39,7 @@ import javax.lang.model.util.Types;
  * 4、在 javax.annotation.processing.Processor 文件写入注解处理器的全称，包括包路径；
  * <p>
  * 方案2
- * 每一个注解处理器类都必须有一个空的构造函数，默认不写就行（不懂～～，我是用第一个方案解决的）;
+ * 使用google开源的auto，添加@AutoService(Processor.class)即可
  *
  * <2>需要重写四个方法
  */
@@ -173,7 +169,7 @@ public class MyProcessor extends AbstractProcessor {
     //================================================================================================
 
     /**
-     * 创建 MyBindView的处理类
+     * 创建 MyBindView的处理类,处理自定义注解
      *
      * @param roundEnv
      */
@@ -204,7 +200,7 @@ public class MyProcessor extends AbstractProcessor {
         //如果集合中不存在，则添加到集合中
         if (annotationClass == null) {
             //创建注解处理类
-            annotationClass = new MyAnnotationClass(typeElement, typesUtils);
+            annotationClass = new MyAnnotationClass(typeElement, elements);
             mAnnotatedClassMap.put(fullName, annotationClass);
         }
         return annotationClass;
