@@ -1,6 +1,7 @@
 # APT/JavaPoet 编译期注解处理技术（自定义ButterKnife注解）
 
 APT（Annotation Processing Tool）
+
 ## 注解简介：
 运行时注解：因为性能问题被诟病
 
@@ -32,6 +33,8 @@ abstractProcess:用于在编译时（通常as点击build按钮后），扫描和
 2. init()方法：Types/Elements/Filer 获取工具
 3. getSupportedAnnotationTypes:处理器想要处理的自定义注解
 4. getSupportedSourceVersion： 指定使用的Java版本
+
+### 详解注解依赖的开源功能：
 
     
 ### 具体代码实现步骤

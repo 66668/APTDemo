@@ -6,6 +6,7 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.Name;
 import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.TypeMirror;
 
 /**
  * 自定义注解MyBindView处理，获取注解使用位置的包名，注解绑定控件的id
@@ -43,5 +44,14 @@ public class MyBindViewField {
 
     public int getmResId() {
         return mResId;
+    }
+
+    /**
+     * 获取变量类型
+     *
+     * @return
+     */
+    TypeMirror getFieldType() {
+        return mVariableElement.asType();
     }
 }

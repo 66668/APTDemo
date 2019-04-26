@@ -1,2 +1,2 @@
-#解决public class MyProcessor extends AbstractProcessor报红的方案之一，该方案隐藏，使用另一个方案
-#com.sjy.compiler.MyProcessor
+#解决public class MyProcessor extends AbstractProcessor报红的方案之一，本例使用该方案，隐藏另一个方案
+com.sjy.compiler.MyProcessor

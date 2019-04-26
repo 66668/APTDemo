@@ -56,7 +56,10 @@ public class MyAnnotationClass {
         //添加bindView方法的处理解析
         for (MyBindViewField field : mFields) {
             //三个参数
-            bindViewBuidler.addStatement("host.$N = ($T)(finder.findView(source, $L))", field.getFieldName());
+            bindViewBuidler.addStatement("host.$N = ($T)(finder.findView(source, $L))"
+                    , field.getFieldName()
+                    ,ClassName.get(field.getFieldType())
+                    ,field.getmResId());
         }
 
         //（2）生成java方法unbindView：
