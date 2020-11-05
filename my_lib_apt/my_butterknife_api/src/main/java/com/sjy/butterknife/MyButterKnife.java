@@ -35,7 +35,7 @@ public class MyButterKnife {
             //看下对应的ViewBinder是否存在
             MyViewBinder binder = binderMap.get(className);
             if (binder == null) {
-                //不存在则通过反射创建一个 然后存入缓存 这个类是通过javapoet生成的
+                //不存在则通过 反射 创建一个 然后存入缓存 这个类是通过javapoet生成的
                 Class aClass = Class.forName(className + "$MyViewBinder");
                 binder = (MyViewBinder) aClass.newInstance();
                 binderMap.put(className, binder);

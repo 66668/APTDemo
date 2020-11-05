@@ -39,7 +39,6 @@ public class MainActivity extends AppCompatActivity {
                 text_01.setText(buffer.toString());
             }
         });
-
     }
 
     @Override
